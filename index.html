@@ -1,0 +1,872 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>何佳悦的个人作品集 | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f3f7f5;
+      --bg-soft: #e6eee9;
+      --ink: #112622;
+      --muted: #52706a;
+      --primary: #1a4d44;
+      --secondary: #3b6e64;
+      --accent: #5fa093;
+      --paper: rgba(255, 255, 255, 0.62);
+      --line: rgba(26, 77, 68, 0.14);
+      --shadow: 0 22px 56px rgba(26, 77, 68, 0.12);
+      --shadow-strong: 0 32px 76px rgba(26, 77, 68, 0.2);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; height: 100%; }
+    body {
+      font-family: 'Noto Sans SC', sans-serif;
+      color: var(--ink);
+      background: linear-gradient(180deg, var(--bg) 0%, var(--bg-soft) 100%);
+      overflow: hidden;
+      line-height: 1.78;
+    }
+
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.72;
+    }
+
+    h1, h2, h3, .logo, .section-title span, .card-num { font-family: 'Playfair Display', serif; }
+    img { display: block; max-width: 100%; height: auto; }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      width: 100%;
+      padding: 1.15rem 6%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(243, 247, 245, 0.72);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .logo {
+      color: var(--primary);
+      font-size: 1.45rem;
+      font-weight: 600;
+      letter-spacing: 3px;
+      white-space: nowrap;
+    }
+
+    nav { display: flex; align-items: center; gap: 2.1rem; }
+    nav a {
+      color: var(--ink);
+      text-decoration: none;
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      position: relative;
+      transition: color 0.25s ease;
+      white-space: nowrap;
+    }
+    nav a::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -6px;
+      width: 0;
+      height: 1.5px;
+      background: var(--primary);
+      transition: width 0.25s ease;
+    }
+    nav a:hover,
+    nav a.active { color: var(--primary); font-weight: 500; }
+    nav a:hover::after,
+    nav a.active::after { width: 100%; }
+
+    main { height: 100vh; width: 100vw; position: relative; }
+    .page {
+      position: absolute;
+      inset: 0;
+      padding: 7.4rem 7% 3.3rem;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(18px) scale(0.99);
+      transition: opacity 0.45s ease, transform 0.45s ease, visibility 0s linear 0.45s;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(26, 77, 68, 0.24) transparent;
+    }
+    .page.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+      transition-delay: 0s;
+    }
+
+    .section-title {
+      color: var(--primary);
+      text-align: center;
+      font-size: clamp(2.1rem, 4vw, 3.1rem);
+      margin-bottom: 2.2rem;
+      line-height: 1.15;
+    }
+    .section-title span {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+      font-size: 0.95rem;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, 1.05fr) minmax(310px, 0.95fr);
+      gap: 4rem;
+      align-items: center;
+    }
+    .hero-text h1 {
+      color: var(--primary);
+      font-size: clamp(4rem, 9vw, 7.2rem);
+      line-height: 0.95;
+      font-weight: 400;
+      margin-bottom: 1.5rem;
+    }
+    .subtitle {
+      color: var(--secondary);
+      letter-spacing: 8px;
+      text-transform: uppercase;
+      margin-bottom: 2.2rem;
+      font-size: 1.1rem;
+    }
+    .hero-copy { color: var(--muted); font-size: 1.1rem; max-width: 580px; }
+
+    .gallery-matrix {
+      position: relative;
+      min-height: 70vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .matrix-item {
+      position: absolute;
+      overflow: hidden;
+      border: 4px solid #fff;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      background: #fff;
+      transition: transform 0.45s ease, filter 0.45s ease, box-shadow 0.45s ease;
+    }
+    .matrix-item img { width: 100%; height: 100%; object-fit: cover; }
+    .gallery-matrix:hover .matrix-item { filter: saturate(0.7) contrast(0.92) opacity(0.7); }
+    .matrix-item:hover { z-index: 20; filter: none !important; transform: scale(1.08) !important; box-shadow: var(--shadow-strong); }
+    .img-main { width: min(42vw, 330px); aspect-ratio: 3 / 4; transform: rotate(-2deg); }
+    .img-wide { width: min(30vw, 280px); aspect-ratio: 16 / 10; transform: translate(145px, -150px) rotate(5deg); }
+    .img-portrait { width: min(25vw, 220px); aspect-ratio: 3 / 4; transform: translate(-185px, 105px) rotate(6deg); }
+    .img-small { width: min(22vw, 190px); aspect-ratio: 4 / 3; transform: translate(155px, 170px) rotate(-5deg); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+      gap: 3rem;
+      align-items: center;
+      width: min(1120px, 100%);
+      margin: 0 auto;
+    }
+    .profile-card, .timeline-panel, .capability-card, .video-panel {
+      background: var(--paper);
+      border: 1px solid rgba(255,255,255,0.72);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .profile-card { padding: 2rem; text-align: center; }
+    .avatar {
+      width: min(280px, 82%);
+      margin: 0 auto 1.4rem;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 5px solid #fff;
+      box-shadow: 0 16px 40px rgba(26,77,68,0.15);
+    }
+    .profile-card h3 { color: var(--primary); font-size: 1.9rem; margin-bottom: 0.3rem; }
+    .profile-card p { color: var(--muted); }
+    .skills { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.65rem; margin-top: 1.4rem; }
+    .pill { padding: 0.35rem 0.75rem; border: 1px solid var(--line); border-radius: 999px; color: var(--primary); background: rgba(255,255,255,0.45); font-size: 0.86rem; }
+    .timeline-panel { padding: 2.5rem; }
+    .timeline-item { border-left: 2px solid var(--accent); padding-left: 1.7rem; margin-bottom: 2rem; position: relative; }
+    .timeline-item:last-child { margin-bottom: 0; }
+    .timeline-item::before { content: ''; position: absolute; left: -7px; top: 0.55rem; width: 12px; height: 12px; border-radius: 50%; background: var(--primary); box-shadow: 0 0 0 4px #fff; }
+    .time-tag { color: var(--secondary); font-weight: 600; font-family: 'Playfair Display', serif; }
+    .timeline-item h4 { margin: 0.25rem 0 0.35rem; color: var(--primary); font-size: 1.25rem; }
+    .timeline-item p { color: var(--muted); }
+
+    #capabilities { justify-content: flex-start; }
+    .capabilities-shell { width: min(1240px, 100%); margin: 0 auto; }
+    .capability-list { display: flex; flex-direction: column; gap: 2.2rem; padding-bottom: 2rem; }
+    .capability-card {
+      padding: clamp(1.5rem, 3.4vw, 3.3rem);
+      display: grid;
+      grid-template-columns: minmax(320px, 0.9fr) minmax(360px, 1.1fr);
+      gap: 2.5rem;
+      align-items: center;
+    }
+    .capability-card.reverse .capability-copy { grid-column: 2; }
+    .capability-card.reverse .capability-images { grid-column: 1; grid-row: 1; }
+    .capability-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.1rem; }
+    .card-num { font-size: 3rem; color: rgba(95,160,147,0.28); line-height: 1; }
+    .capability-header h3 { color: var(--primary); font-size: clamp(1.55rem, 3vw, 2.25rem); }
+    .badges { display: flex; flex-wrap: wrap; gap: 0.55rem; margin-bottom: 1.25rem; }
+    .badge { color: var(--primary); background: rgba(26,77,68,0.08); border: 1px solid rgba(26,77,68,0.12); border-radius: 5px; padding: 0.25rem 0.68rem; font-size: 0.85rem; }
+    .capability-copy p { color: var(--muted); font-size: 0.95rem; margin-bottom: 0.9rem; }
+    .capability-copy strong { color: var(--ink); }
+    .capability-copy ul { list-style: none; color: var(--muted); font-size: 0.94rem; }
+    .capability-copy li { padding-left: 1rem; margin-bottom: 0.45rem; position: relative; }
+    .capability-copy li::before { content: ''; position: absolute; left: 0; top: 0.82rem; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+
+    .capability-images { display: grid; gap: 1rem; align-items: start; }
+    .image-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .image-stack .wide { grid-column: span 2; }
+    .portfolio-img {
+      background: rgba(255,255,255,0.58);
+      border: 1px solid rgba(26,77,68,0.12);
+      border-radius: 8px;
+      padding: 0.65rem;
+      box-shadow: 0 10px 25px rgba(26,77,68,0.07);
+      transition: transform 0.28s ease, box-shadow 0.28s ease;
+      cursor: zoom-in;
+    }
+    .portfolio-img:hover { transform: translateY(-4px); box-shadow: 0 18px 36px rgba(26,77,68,0.13); }
+    .portfolio-img img { width: auto; max-width: 100%; height: auto; max-height: min(46vh, 520px); margin: 0 auto; object-fit: contain; }
+    .portfolio-img.long img { max-height: min(58vh, 680px); }
+    .portfolio-img.wide img { width: 100%; }
+    .portfolio-img.compact img { width: 78%; }
+    .portfolio-img.compact-wide img { width: 82%; }
+    .portfolio-img figcaption { color: var(--muted); text-align: center; font-size: 0.8rem; margin-top: 0.45rem; }
+    .copywriting-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .copywriting-grid .wide { grid-column: span 2; }
+    .copywriting-grid .portfolio-img img { max-height: min(46vh, 520px); }
+
+    #multimedia { justify-content: flex-start; }
+    .media-shell { width: min(1180px, 100%); margin: 0 auto; }
+    .media-intro { color: var(--primary); font-size: 1.08rem; font-weight: 500; margin-bottom: 1.4rem; }
+    .cover-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 980px;
+      margin: 0 auto;
+    }
+    .photo-cover {
+      position: relative;
+      height: 210px;
+      border: 0;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 0;
+      text-align: left;
+    }
+    .photo-cover img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.55s ease; }
+    .photo-cover:hover img { transform: scale(1.05); }
+    .cover-label {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 1.35rem;
+      color: #fff;
+      background: linear-gradient(transparent, rgba(17,38,34,0.88));
+    }
+    .cover-label strong { display: block; font-size: 1.15rem; margin-bottom: 0.1rem; }
+    .cover-label span { font-size: 0.86rem; opacity: 0.86; }
+    .video-panel { margin-top: 2.2rem; padding: 1.4rem; }
+    .video-panel h3 { color: var(--primary); font-size: 1.15rem; margin-bottom: 1rem; }
+    .video-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+    .video-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.9rem 1.1rem;
+      color: var(--ink);
+      text-decoration: none;
+      background: rgba(255,255,255,0.55);
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+    }
+    .video-btn:hover { background: var(--primary); color: #fff; transform: translateX(4px); }
+
+    .photo-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      background: rgba(238, 246, 242, 0.96);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      display: none;
+      overflow-y: auto;
+      padding: 6rem 5vw 4rem;
+    }
+    .photo-overlay.open { display: block; }
+    .zoom-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 360;
+      display: none;
+      padding: 5.5rem 4vw 3rem;
+      background: rgba(17, 38, 34, 0.82);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+    }
+    .zoom-overlay.open {
+      display: grid;
+      place-items: center;
+    }
+    .zoom-frame {
+      position: relative;
+      width: min(1180px, 100%);
+      max-height: 86vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.9rem;
+    }
+    .zoom-frame img {
+      width: auto;
+      max-width: 100%;
+      height: auto;
+      max-height: 78vh;
+      object-fit: contain;
+      border-radius: 8px;
+      background: #fff;
+      box-shadow: 0 28px 80px rgba(0,0,0,0.36);
+    }
+    .zoom-caption { color: rgba(255,255,255,0.86); font-size: 0.95rem; }
+    .zoom-close {
+      position: absolute;
+      top: -3.4rem;
+      right: 0;
+      border: 1px solid rgba(255,255,255,0.32);
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.65rem 1rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .overlay-top {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 0.9rem 0;
+      background: rgba(238, 246, 242, 0.86);
+      backdrop-filter: blur(10px);
+    }
+    .overlay-title { color: var(--primary); font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.1; }
+    .back-btn {
+      border: 1px solid var(--line);
+      background: var(--primary);
+      color: #fff;
+      border-radius: 999px;
+      padding: 0.72rem 1.15rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .spread-gallery {
+      position: relative;
+      min-height: 70vh;
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-auto-rows: 34px;
+      gap: 1rem;
+      align-items: start;
+    }
+    .spread-card {
+      background: #fff;
+      border: 1px solid rgba(26,77,68,0.12);
+      border-radius: 8px;
+      padding: 0.65rem;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(32px) rotate(0deg) scale(0.94);
+      animation: spreadIn 0.62s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .spread-card img { width: 100%; height: auto; object-fit: contain; }
+    .spread-card:nth-child(1) { grid-column: 1 / span 5; grid-row: 1 / span 8; transform: translate(22vw, 18vh) rotate(-4deg) scale(0.85); }
+    .spread-card:nth-child(2) { grid-column: 6 / span 4; grid-row: 4 / span 8; animation-delay: 0.06s; transform: translate(-10vw, 20vh) rotate(5deg) scale(0.85); }
+    .spread-card:nth-child(3) { grid-column: 9 / span 4; grid-row: 1 / span 8; animation-delay: 0.12s; transform: translate(-25vw, 26vh) rotate(-2deg) scale(0.85); }
+    .spread-card:nth-child(4) { grid-column: 2 / span 4; grid-row: 14 / span 8; animation-delay: 0.18s; transform: translate(24vw, -10vh) rotate(3deg) scale(0.85); }
+    .spread-card:nth-child(5) { grid-column: 6 / span 6; grid-row: 13 / span 8; animation-delay: 0.24s; transform: translate(-18vw, -12vh) rotate(-4deg) scale(0.85); }
+    .spread-card:nth-child(6) { grid-column: 1 / span 3; grid-row: 24 / span 8; animation-delay: 0.3s; }
+    .spread-card:nth-child(7) { grid-column: 4 / span 4; grid-row: 23 / span 8; animation-delay: 0.36s; }
+    .spread-card:nth-child(8) { grid-column: 8 / span 4; grid-row: 23 / span 8; animation-delay: 0.42s; }
+    @keyframes spreadIn { to { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1); } }
+
+    @media (max-width: 980px) {
+      body { overflow: hidden; }
+      header { padding: 0.9rem 4%; align-items: flex-start; gap: 0.8rem; }
+      nav { gap: 1rem; flex-wrap: wrap; justify-content: flex-end; }
+      nav a { font-size: 0.86rem; }
+      .page { padding: 7.2rem 5% 2.5rem; justify-content: flex-start; }
+      .hero-grid, .about-grid, .capability-card, .capability-card.reverse { grid-template-columns: 1fr; gap: 2rem; }
+      .capability-card.reverse .capability-copy, .capability-card.reverse .capability-images { grid-column: auto; grid-row: auto; }
+      .gallery-matrix { min-height: 46vh; }
+      .cover-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.65rem;
+        max-width: 100%;
+      }
+      .video-links { grid-template-columns: 1fr; }
+      .photo-cover { height: 150px; }
+      .image-stack, .copywriting-grid { grid-template-columns: 1fr; }
+      .image-stack .wide { grid-column: span 1; }
+      .copywriting-grid .wide { grid-column: span 1; }
+      .portfolio-img img { max-height: min(48vh, 520px); }
+      .portfolio-img.long img { max-height: min(56vh, 620px); }
+      .portfolio-img.compact img { width: 76%; }
+      .portfolio-img.compact-wide img { width: 78%; }
+      .spread-gallery { display: flex; flex-direction: column; }
+      .spread-card { width: 100%; animation-delay: 0s !important; }
+    }
+
+    @media (max-width: 640px) {
+      .logo { font-size: 1.1rem; }
+      nav { width: 100%; justify-content: space-between; gap: 0.5rem; }
+      nav a { margin: 0; font-size: 0.78rem; }
+      .page { padding-top: 7rem; }
+      .subtitle { letter-spacing: 4px; }
+      .hero-grid { text-align: center; }
+      .hero-copy { margin: 0 auto; }
+      .img-main { width: 54vw; }
+      .img-wide { width: 40vw; transform: translate(90px, -100px) rotate(5deg); }
+      .img-portrait { width: 34vw; transform: translate(-95px, 90px) rotate(6deg); }
+      .img-small { width: 34vw; transform: translate(90px, 115px) rotate(-5deg); }
+      .capability-card, .timeline-panel, .profile-card { padding: 1.25rem; }
+      .cover-label { padding: 1rem; }
+      .photo-cover { height: 122px; }
+      .cover-label strong { font-size: 0.92rem; }
+      .cover-label span { font-size: 0.72rem; }
+    }
+
+.spread-data {
+  margin-top: 30px; 
+}
+
+.operation-horizontal-pic {
+  margin-top: 30px; 
+}
+
+.account-homepage {
+  margin-top: 30px; 
+}
+
+/* 完美复刻 p2 效果：小方块和所有多行文字强制左顶格对齐 */
+.title-dot {
+  display: flex !important;
+  align-items: flex-start !important; /* 确保小方块死死对齐第一行字 */
+  justify-content: flex-start !important; /* 强制整个包裹盒子从最左边开始排列 */
+  text-align: left !important; /* 强制多行文本左对齐 */
+  width: 100% !important; /* 让它占满左边通道的宽度 */
+  gap: 10px !important;
+}
+
+/* 重点：把你段落里包裹的加粗文字也强行拽到最左边 */
+.title-dot strong, 
+.title-dot span {
+  text-align: left !important;
+  display: inline-block !important;
+}
+
+/* 把原本的方块升级为图二里精致的小星星 */
+.title-dot::before {
+  content: "✦";         /* 1. 核心：把内容换成精致的四角复古星 */
+  font-size: 16px;      /* 2. 控制星星的大小（如果觉得太小可以改成 18px） */
+  color: var(--primary);/* 3. 颜色依然完美继承你网页的墨绿色 */
+  font-family: inherit;
+  flex-shrink: 0;       /* 4. 确保星星绝对不会被文字挤压变形 */
+  
+  /* 5. 细节对齐微调：让星星精准居中对齐第一行文字的视觉中心 */
+  margin-top: 1px !important; 
+  display: inline-block !important;
+  line-height: 1 !important;
+}
+  </style>
+</head>
+<body>
+  <canvas id="bg-canvas"></canvas>
+
+  <header>
+    <div class="logo">HJY.</div>
+    <nav aria-label="主导航">
+      <a href="#hero" class="active" data-target="hero">首页</a>
+      <a href="#about" data-target="about">简介</a>
+      <a href="#capabilities" data-target="capabilities">能力案例</a>
+      <a href="#multimedia" data-target="multimedia">视听影像</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="hero" class="page active" aria-label="首页">
+      <div class="hero-grid">
+        <div class="hero-text">
+          <p class="subtitle">Personal Portfolio</p>
+          <h1>何佳悦</h1>
+          <p class="hero-copy">新南威尔士大学（QS20）· Media</p> 
+          <p> 创意策划|新媒体运营|视觉表达|影像叙事</p>
+        </div>
+        <div class="gallery-matrix" aria-label="首页照片墙">
+          <figure class="matrix-item img-main"><img src="images/首页1.jpg" alt="个人首页照片"></figure>
+          <figure class="matrix-item img-wide"><img src="images/首页2.jpg" alt="风景摄影作品"></figure>
+          <figure class="matrix-item img-portrait"><img src="images/首页3.jpg" alt="人像摄影作品"></figure>
+          <figure class="matrix-item img-small"><img src="images/首页4.jpg" alt="活动摄影作品"></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="page" aria-label="个人简介">
+      <h2 class="section-title"><span>01. Biography</span>个人简介</h2>
+      <div class="about-grid">
+        <aside class="profile-card">
+          <div class="avatar"><img src="images/avatar.jpg" alt="何佳悦头像"></div>
+          <h3>何佳悦</h3>
+          <p>Media / 新媒体运营 / 视觉与文案创作者</p>
+          <div class="skills">
+            <p class="title-dot text-left">雅思6.5 CET4 CET6</p>
+            <p class="title-dot text-left">计算机二级</p>
+            <p class="title-dot text-left">普通话二级甲等</p>
+            <p class="title-dot text-left">熟练运用Ps、Pr、An、Canva、剪映等软件</p>
+            <p class="title-dot text-left">熟悉ChatGPT、Gemini、Codex、Claude Code等大语言模型，精通Vibe Coding</p>
+              <p class="text-left"></p>
+          </div>
+        </aside>
+        <div class="timeline-panel">
+          <div class="timeline-item">
+            <span class="time-tag">2024.02 - 2024.03</span>
+            <h4>杭州文化广播电视集团</h4>
+            <p>影视频道实习生：参与《星光之约》节目前期选题策划及公众号文稿撰写。</p>
+          </div>
+          <div class="timeline-item">
+            <span class="time-tag">2024.07 - 2024.12</span>
+            <h4>第五届全国中医药传承创新发展大会</h4>
+            <p>新媒体运营：参与矩阵账号内容搭建、发布节奏规划、活动传播与数据复盘。</p>
+          </div>
+          <div class="timeline-item">
+            <span class="time-tag">2025.12 - 2026.02</span>
+            <h4>淘宝天下传媒有限公司</h4>
+            <p>营销策划实习生：参与项目创意脑暴、策划案撰写、传播话题梳理与方案优化。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="capabilities" class="page" aria-label="能力案例">
+      <div class="capabilities-shell">
+        <h2 class="section-title"><span>02. Core Capabilities</span>核心能力展示</h2>
+        <div class="capability-list">
+          <article class="capability-card">
+            <div class="capability-copy">
+              <div class="capability-header"><span class="card-num">02</span><h3>营销策划能力</h3></div>
+              <div class="badges"><span class="badge">全网曝光 <b>61.7亿</b></span><span class="badge">互动量 <b>189.2万</b></span><span class="badge">微博主榜文娱 <b>50个</b></span></div>
+              <p><strong>营销策划案例：千问学习模型 / 天猫年货节 / “美的”支付宝集五福</strong></p>
+              <p>负责前期创意脑暴、营销策划方案撰写，根据业务需求优化策划案，完成项目筹备与方案定稿工作。</p>
+              <p>参与千问、天猫年货节、“美的”支付宝集五福等多个项目落地执行，覆盖话题传播、内容物料、传播亮点梳理与执行推进。</p>
+              <figure class="portfolio-img wide compact-wide spread-data"><img src="images/营销策划/营销策划3.jpg" alt="营销策划案例图 3"><figcaption><i>“美的”支付宝集五福</i> - 红书侧话题讨论度</figcaption></figure>
+            </div>
+            <div class="capability-images image-stack">
+              <figure class="portfolio-img long"><img src="images/营销策划/营销策划1.jpg" alt="营销策划案例图 1"><figcaption><i>千问学习模型</i> - 微博侧话题讨论度</figcaption></figure>
+              <figure class="portfolio-img long"><img src="images/营销策划/营销策划2.jpg" alt="营销策划案例图 2"><figcaption><i>天猫年货节</i> - 红书侧话题讨论度</figcaption></figure>
+              
+            </div>
+          </article>
+
+          <article class="capability-card reverse">
+            <div class="capability-copy">
+              <div class="capability-header"><span class="card-num">03</span><h3>运营能力 · 案例一</h3></div>
+              <div class="badges"><span class="badge">矩阵账号 <b>30+</b></span><span class="badge">发布视频 <b>7500+</b></span><span class="badge">总播放量 <b>500万+</b></span></div>
+              <p><strong>第五届全国中医药传承创新发展大会抖音矩阵运营</strong></p>
+              <p>创建<b>30+</b>矩阵账号，发布视频总计<b>7500+条</b>，总播放量超过<b>五百万</b></p>
+              <p>通过持续发布、账号定位区分与内容分类管理，提升大会传播覆盖面，支持中医药传承技术与产业交流合作平台的品牌孵化。</p>
+              <figure class="portfolio-img wide operation-horizontal-pic">
+    <img src="images/运营/运营1.jpg" alt="运营案例横图">
+    <figcaption>矩阵账号数据汇总</figcaption>
+</figure>
+            </div>
+            <div class="capability-images image-stack" >
+              <figure class="portfolio-img long"><img src="images/运营/运营2.png" alt="运营案例长图 1"><figcaption>账号内容与数据记录</figcaption></figure>
+              <figure class="portfolio-img long"><img src="images/运营/运营3.jpg" alt="运营案例长图 2"><figcaption>账号展示</figcaption></figure>
+            </div>
+          </article>
+
+          <article class="capability-card">
+            <div class="capability-copy">
+              <div class="capability-header"><span class="card-num">03+</span><h3>运营能力 · 案例二</h3></div>
+              <div class="badges"><span class="badge">小红书摄影</span><span class="badge">爆款笔记</span><span class="badge">互动量 <b>2000+</b></span></div>
+              <p><strong>小红书个人约拍账号运营</strong></p>
+              <ul>
+                以游客及爱好拍照人群为核心受众，定位为摄影约拍类账号，结合旅游场景输出原创内容，打造具有线下转化潜力的个人品牌。
+                <li>独立完成客片拍摄、修图、文案撰写及排版，内容涵盖约拍作品展示与精选旅行攻略；</li>
+                <li>注重内容差异化与视觉美感，平均每周发布2–3篇高质量原创笔记，平均每篇配备创意标题与互动引导；</li>
+                <li><b>多条笔记浏览量破万</b>，账号总互动量（点赞、收藏、评论）达<b>2000</b>，有效提升账号曝光与用户粘性； </li>
+                <li>探索账号线下变现路径，包括私域转化与本地约拍合作。</li>
+              </ul>
+              <figure class="portfolio-img wide compact account-homepage"><img src="images/小红书/小红书1.jpg" alt="小红书案例图 1"><figcaption>账号首页</figcaption></figure>
+            </div>
+            <div class="capability-images image-stack">
+              
+              <figure class="portfolio-img long"><img src="images/小红书/小红书2.jpg" alt="小红书案例图 2"><figcaption>笔记数据概览</figcaption></figure>
+              <figure class="portfolio-img long"><img src="images/小红书/小红书4.jpg" alt="小红书案例图 4"><figcaption>笔记案例详情</figcaption></figure>
+            </div>
+          </article>
+
+          <article class="capability-card reverse">
+            <div class="capability-copy">
+              <div class="capability-header"><span class="card-num">04</span><h3>文案能力</h3></div>
+              <div class="badges"><span class="badge">选题调研</span><span class="badge">脚本撰写</span><span class="badge">排版编辑</span></div>
+              <p><strong>《星光之约》前期策划与文稿创作</strong></p>
+              <p>参与节目选题调研与拍摄脚本撰写，负责浙江星光影视公众号原创文稿及内容编辑排版。</p>
+              <ul>
+                <li>《傲慢与偏见》：情不知所起，一往情深。</li>
+                <li>《霍元甲》：侠之大者，为国为民。</li>
+                <li>《狂飙》：探寻深渊与光明的复杂乐章。</li>
+              </ul>
+            </div>
+            <div class="capability-images copywriting-grid">
+              <figure class="portfolio-img long"><img src="images/文案/文案1.jpg" alt="文案能力案例图 1"><figcaption>公众号文稿概览</figcaption></figure>
+              <figure class="portfolio-img long"><img src="images/文案/文案2.jpg" alt="文案能力案例图 2"><figcaption>文案案例展示</figcaption></figure>
+              <figure class="portfolio-img wide"><img src="images/文案/文案3.jpg" alt="文案能力案例图 3"><figcaption>脚本与内容节选</figcaption></figure>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="multimedia" class="page" aria-label="视听影像">
+      <div class="media-shell">
+        <h2 class="section-title"><span>03. Visual Media</span>拍摄与剪辑能力</h2>
+        <p class="media-intro">摄影视听作品集</p>
+        <div class="cover-grid">
+          <button class="photo-cover" type="button" data-gallery="landscape">
+            <img src="images/风景摄影/摄影1.jpg" alt="风景摄影封面">
+            <span class="cover-label"><strong>风景摄影</strong><span>点击展开作品</span></span>
+          </button>
+          <button class="photo-cover" type="button" data-gallery="portrait">
+            <img src="images/人像/人像7.jpg" alt="人像摄影封面">
+            <span class="cover-label"><strong>人像摄影</strong><span>点击展开作品</span></span>
+          </button>
+          <button class="photo-cover" type="button" data-gallery="event">
+            <img src="images/活动摄影/活动1.jpg" alt="活动摄影封面">
+            <span class="cover-label"><strong>活动摄影</strong><span>点击展开作品</span></span>
+          </button>
+        </div>
+        <div class="video-panel">
+          <h3>视频创作与剪辑作品</h3>
+          <div class="video-links">
+            <a href="https://www.bilibili.com/video/BV1JgdgYGEJA/" target="_blank" class="video-btn"><span>【魔力乳膏】</span><span>Explore</span></a>
+            <a href="https://www.bilibili.com/video/BV175dgYzEBT/" target="_blank" class="video-btn"><span>【别找我麻烦 MV】</span><span>Explore</span></a>
+            <a href="https://www.bilibili.com/video/BV1e11GBgEx1/" target="_blank" class="video-btn"><span>【A Dialogue with Light】</span><span>Explore</span></a>
+            <a href="https://www.bilibili.com/video/BV1JD1CBTEK6/" target="_blank" class="video-btn"><span>【寻找并蒂果】</span><span>Explore</span></a>
+            <a href="https://www.bilibili.com/video/BV1gy766jE18/" target="_blank" class="video-btn"><span>【Growing Together 360 全景视频】</span><span>Explore</span></a>
+            <a href="https://www.bilibili.com/video/BV1MU766CEYE/" target="_blank" class="video-btn"><span>【The Venetian Society】</span><span>Explore</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="photo-overlay" id="photoOverlay" aria-hidden="true">
+    <div class="overlay-top">
+      <h2 class="overlay-title" id="overlayTitle">摄影作品</h2>
+      <button class="back-btn" type="button" id="closeOverlay">返回</button>
+    </div>
+    <div class="spread-gallery" id="spreadGallery"></div>
+  </div>
+
+  <div class="zoom-overlay" id="zoomOverlay" aria-hidden="true">
+    <div class="zoom-frame">
+      <button class="zoom-close" type="button" id="closeZoom">返回</button>
+      <img id="zoomImage" src="" alt="">
+      <p class="zoom-caption" id="zoomCaption"></p>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('bg-canvas');
+    const ctx = canvas.getContext('2d');
+    let width = canvas.width = window.innerWidth;
+    let height = canvas.height = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    });
+
+    class LightSpeck {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.size = Math.random() * 24 + 14;
+        this.speedY = -(Math.random() * 0.2 + 0.08);
+        this.alpha = Math.random() * 0.22 + 0.05;
+        this.angle = Math.random() * Math.PI * 2;
+        this.bloomSpeed = Math.random() * 0.01 + 0.004;
+      }
+      update() {
+        this.y += this.speedY;
+        this.angle += this.bloomSpeed;
+        this.currentAlpha = this.alpha + Math.sin(this.angle) * 0.035;
+        if (this.y < -this.size) {
+          this.y = height + this.size;
+          this.x = Math.random() * width;
+        }
+      }
+      draw() {
+        const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+        gradient.addColorStop(0, `rgba(95, 160, 147, ${Math.max(0, this.currentAlpha)})`);
+        gradient.addColorStop(0.65, `rgba(173, 196, 184, ${Math.max(0, this.currentAlpha * 0.3)})`);
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    const specks = Array.from({ length: 34 }, () => new LightSpeck());
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      specks.forEach((speck) => { speck.update(); speck.draw(); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    const pages = [...document.querySelectorAll('.page')];
+    const navLinks = [...document.querySelectorAll('nav a')];
+    function showPage(id) {
+      pages.forEach((page) => page.classList.toggle('active', page.id === id));
+      navLinks.forEach((link) => link.classList.toggle('active', link.dataset.target === id));
+      history.replaceState(null, '', `#${id}`);
+      const current = document.getElementById(id);
+      if (current) current.scrollTop = 0;
+    }
+
+    navLinks.forEach((link) => {
+      link.addEventListener('click', (event) => {
+        event.preventDefault();
+        showPage(link.dataset.target);
+      });
+    });
+
+    const initial = location.hash ? location.hash.slice(1) : 'hero';
+    if (pages.some((page) => page.id === initial)) showPage(initial);
+
+    const galleries = {
+      landscape: {
+        title: '风景摄影',
+        images: ['images/风景摄影/摄影1.jpg', 'images/风景摄影/摄影2.jpg', 'images/风景摄影/摄影3.jpg', 'images/风景摄影/摄影4.jpg','images/风景摄影/摄影5.jpg','images/风景摄影/摄影6.jpg']
+      },
+      portrait: {
+        title: '人像摄影',
+        images: ['images/人像/人像1.jpg', 'images/人像/人像2.jpg', 'images/人像/人像3.jpg', 'images/人像/人像4.jpg', 'images/人像/人像5.jpg', 'images/人像/人像6.jpg', 'images/人像/人像7.jpg', 'images/人像/人像8.jpg']
+      },
+      event: {
+        title: '活动摄影',
+        images: ['images/活动摄影/活动1.jpg', 'images/活动摄影/活动2.jpg', 'images/活动摄影/活动3.jpg', 'images/活动摄影/活动4.jpg', 'images/活动摄影/活动5.jpg']
+      }
+    };
+
+    const overlay = document.getElementById('photoOverlay');
+    const overlayTitle = document.getElementById('overlayTitle');
+    const spreadGallery = document.getElementById('spreadGallery');
+    const closeOverlay = document.getElementById('closeOverlay');
+    const zoomOverlay = document.getElementById('zoomOverlay');
+    const zoomImage = document.getElementById('zoomImage');
+    const zoomCaption = document.getElementById('zoomCaption');
+    const closeZoom = document.getElementById('closeZoom');
+
+    function openGallery(key) {
+      const gallery = galleries[key];
+      if (!gallery) return;
+      overlayTitle.textContent = gallery.title;
+      spreadGallery.innerHTML = gallery.images.map((src, index) => `
+        <figure class="spread-card" style="animation-delay:${index * 0.06}s">
+          <img src="${src}" alt="${gallery.title}作品 ${index + 1}">
+        </figure>
+      `).join('');
+      overlay.classList.add('open');
+      overlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeGallery() {
+      overlay.classList.remove('open');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      const activePage = document.querySelector('.page.active');
+      if (activePage) activePage.scrollTop = 0;
+      spreadGallery.innerHTML = '';
+    }
+
+    function openZoom(src, caption) {
+      zoomImage.src = src;
+      zoomImage.alt = caption || '作品原图';
+      zoomCaption.textContent = caption || '';
+      zoomOverlay.classList.add('open');
+      zoomOverlay.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeZoomOverlay() {
+      zoomOverlay.classList.remove('open');
+      zoomOverlay.setAttribute('aria-hidden', 'true');
+      zoomImage.src = '';
+      document.body.style.overflow = overlay.classList.contains('open') ? 'hidden' : '';
+    }
+
+    document.querySelectorAll('.portfolio-img img').forEach((image) => {
+      image.addEventListener('click', () => {
+        const caption = image.closest('figure')?.querySelector('figcaption')?.textContent || image.alt;
+        openZoom(image.getAttribute('src'), caption);
+      });
+    });
+
+    document.querySelectorAll('.photo-cover').forEach((button) => {
+      button.addEventListener('click', () => openGallery(button.dataset.gallery));
+    });
+    closeOverlay.addEventListener('click', closeGallery);
+    overlay.addEventListener('click', (event) => { if (event.target === overlay) closeGallery(); });
+    closeZoom.addEventListener('click', closeZoomOverlay);
+    zoomOverlay.addEventListener('click', (event) => { if (event.target === zoomOverlay) closeZoomOverlay(); });
+    window.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape') return;
+      if (zoomOverlay.classList.contains('open')) closeZoomOverlay();
+      else if (overlay.classList.contains('open')) closeGallery();
+    });
+  </script>
+</body>
+</html>
